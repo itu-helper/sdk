@@ -1,0 +1,41 @@
+name: Bundle JavaScript
+
+on:
+  workflow_dispatch:  # Trigger on manual run
+  push:
+    branches:
+      - main  # Trigger on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull request to 'main' branch
+
+jobs:
+  bundle-js:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # Specify the Node.js version
+
+    - name: Install Dependencies
+      run: |
+        npm install terser
+
+    - name: Concatenate and Minify JavaScript
+      run: |
+        # Create a combined JS file from all *.js files in the 'js/src' directory
+        npx terser js/src/*.js -o js/dist/bundle.min.js --compress --mangle
+
+    - name: Commit Minified File
+      run: |
+        # Commit the minified file if it has changed
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "github-actions@github.com"
+        git add js/dist/bundle.min.js
+        git commit -m "Merged and combined JavaScript files to 'dist/bundle.min.js'"
+        git push

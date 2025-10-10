@@ -34,8 +34,8 @@ jobs:
     - name: Commit Minified File
       run: |
         # Commit the minified file if it has changed
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "github-actions@github.com"
+        git config --global user.name "ITU Helper"
+        git config --global user.email "sdk@itu-helper.com"
         git add js/dist/bundle.min.js
         git commit -m "Merged and combined JavaScript files to 'dist/bundle.min.js'"
         git push

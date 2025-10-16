@@ -8,7 +8,6 @@ class Course {
         this.classRestrictions = classRestrictions;
         this.description = description;
 
-        this.majorRestrictions = "";
         this.lessons = [];
 
         this._createRequirementNames(requirementsText);

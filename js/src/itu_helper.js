@@ -2,10 +2,14 @@ class ITUHelper {
     LESSON_PATH = "https://raw.githubusercontent.com/itu-helper/data/refs/heads/main/lessons.psv";
     COURSE_PATH = "https://raw.githubusercontent.com/itu-helper/data/refs/heads/main/courses.psv";
     COURSE_PLAN_PATH = "https://raw.githubusercontent.com/itu-helper/data/refs/heads/main/course_plans.txt";
+    PROGRAMME_CODES_PATH = "https://raw.githubusercontent.com/itu-helper/data/refs/heads/main/programme_codes.psv";
+    BUILDING_CODES_PATH = "https://raw.githubusercontent.com/itu-helper/data/refs/heads/main/building_codes.psv";
 
     constructor() {
         this._courses = [];
         this._semesters = {};
+        this._programmes = [];
+        this._buildings = [];
         this.coursesDict = {};
 
         this.fileFetchStatus = 0;
@@ -20,9 +24,8 @@ class ITUHelper {
     get courses() {
         if (this._courses.length <= 0) {
             this._createCourses();
-            this._courses.forEach(course => {
-                this.coursesDict[course.courseCode] = course;
-            });
+            this._createProgrammes();
+            this._createBuildings()
             this._createLessons();
             this._connectAllCourses();
         }
@@ -53,6 +56,22 @@ class ITUHelper {
         return this._semesters;
     }
 
+    get programmes() {
+        if (this._programmes.length <= 0) {
+            this._createProgrammes();
+        }
+
+        return this._programmes;
+    }
+
+    get buildings() {
+        if (this._buildings.length <= 0) {
+            this._createBuildings();
+        }
+
+        return this._buildings;
+    }
+
     /**
      * fetches the data from itu-helper/data repo, calls `onFetchComplete`
      * when all files are fetches.
@@ -70,11 +89,19 @@ class ITUHelper {
             this.course_plan_lines = txt.split("\n");
             this._onTextFetchSuccess();
         });
+        this._fetchTextFile(this.PROGRAMME_CODES_PATH, (txt) => {
+            this.programme_codes_lines = txt.split("\n");
+            this._onTextFetchSuccess();
+        });
+        this._fetchTextFile(this.BUILDING_CODES_PATH, (txt) => {
+            this.building_codes_lines = txt.split("\n");
+            this._onTextFetchSuccess();
+        });
     }
 
     _onTextFetchSuccess() {
         this.fileFetchStatus++;
-        if (this.fileFetchStatus >= 3)
+        if (this.fileFetchStatus >= 5)
             this.onFetchComplete();
     }
 
@@ -96,6 +123,10 @@ class ITUHelper {
             let course = new Course(data[0], data[1], data[2], parseInt(data[3]), parseInt(data[4]), data[5], data[6], data[7]);
             this._courses.push(course);
         }
+
+        this._courses.forEach(course => {
+            this.coursesDict[course.courseCode] = course;
+        });
     }
 
     /**
@@ -103,21 +134,78 @@ class ITUHelper {
      * corresponding courses of the `courses` array.
      */
     _createLessons() {
+        const available_majors = this.programmes;
+        const available_buildings = this.buildings;
+
         let lines = this.lesson_lines;
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i].replace("\r", "");
+            if (line.length == 0) continue;
 
             let data = line.split("|");
             let courseCode = data[1];
-            let majorRest = data[9];
-            let currentLesson = new Lesson(data[0], data[2], data[3], data[4],
-                data[5], data[6], data[7], data[8]);
+            
+            let majors = [];
+            if (data[10].trim() !== "-") {
+                for (const m of data[10].split(",")) {
+                    let major_code = m.replace("_LS", "").trim();
+                    for (const m_option of available_majors) {
+                        if (m_option.code === major_code) {
+                            majors.push(m_option);
+                        }
+                    }
+                }
+            }
+
+            let building = null;
+            for (const b of available_buildings) {
+                if (b.code === data[4].trim()) {
+                    building = b;
+                    break;
+                }
+            }
+
+            let currentLesson = new Lesson(
+                data[0], courseCode, data[2], data[3], building,
+                data[5], data[6], data[7], data[8], data[9], majors
+            );
 
             let course = this.findCourseByCode(courseCode);
             if (!course) continue;
 
             course.lessons.push(currentLesson);
-            course.majorRest = majorRest;
+        }
+    }
+
+    /**
+     * processes `programme_codes_lines` to create programmes
+     */
+    _createProgrammes() {
+        this._programmes = [];
+
+        let lines = this.programme_codes_lines;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].replace("\r", "");
+            if (line.length == 0) continue;
+
+            let data = line.split("|");
+            let currentProgramme = new Programme(data[0], data[1], data[2], data[3]);
+            this._programmes.push(currentProgramme);
+        }
+    }
+
+    /**
+     * processes `building_codes_lines` to create buildings
+     */
+    _createBuildings() {
+        let lines = this.building_codes_lines;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].replace("\r", "");
+            if (line.length == 0) continue;
+
+            let data = line.split("|");
+            let currentBuilding = new Building(data[0], data[1], data[2]);
+            this._buildings.push(currentBuilding);
         }
     }
 

@@ -1,12 +1,12 @@
 class Course {
     constructor(code, title, lang, credits, ects, requirementsText, classRestrictions, description) {
         this.courseCode = code;
-        this.courseTitle = title;
+        this.courseTitle = title.replaceAll("&amp;", "&").trim();
         this.lang = lang;
         this.credits = credits;
         this.ects = ects;
         this.classRestrictions = classRestrictions;
-        this.description = description;
+        this.description = description.replaceAll("&amp;", "&").trim();;
 
         this.lessons = [];
 

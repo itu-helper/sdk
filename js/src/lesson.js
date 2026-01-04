@@ -1,10 +1,10 @@
 class Lesson {
-    constructor(crn, course_code, teachingMethod, instructor, building, day, time, room, capacity, enrolled, majors) {
+    constructor(crn, course_code, teachingMethod, instructor, buildings, day, time, room, capacity, enrolled, majors) {
         this.crn = crn;
         this.course_code = course_code?.trim();
         this.teachingMethod = teachingMethod?.trim();
         this.instructor = instructor?.trim();
-        this.building = building;
+        this.buildings = buildings;
         this.time = time?.trim();
         this.day = day?.trim();
         this.room = room?.trim();

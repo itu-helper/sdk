@@ -157,16 +157,21 @@ class ITUHelper {
                 }
             }
 
-            let building = null;
+            let buildings = [];
+            let buildingTexts = data[4].trim().split(" ");
             for (const b of available_buildings) {
-                if (b.code === data[4].trim()) {
-                    building = b;
-                    break;
+                for (const bText of buildingTexts) {
+                    if (b.code === bText.trim()) {
+                        buildings.push(b);
+                        buildingTexts.splice(buildingTexts.indexOf(bText), 1);
+                        
+                        if (buildingTexts.length === 0) break;
+                    }
                 }
             }
 
             let currentLesson = new Lesson(
-                data[0], courseCode, data[2], data[3], building,
+                data[0], courseCode, data[2], data[3], buildings,
                 data[5], data[6], data[7], data[8], data[9], majors
             );
 

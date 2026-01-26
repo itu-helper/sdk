@@ -5,10 +5,12 @@ class Course {
         this.lang = lang;
         this.credits = credits;
         this.ects = ects;
-        this.classRestrictions = classRestrictions;
         this.description = description.replaceAll("&amp;", "&").trim();;
 
         this.lessons = [];
+
+        const parsedClassRestrictions = parseFloat(classRestrictions.replaceAll(",", "."));
+        this.classRestrictions = isNaN(parsedClassRestrictions) ? null : parsedClassRestrictions;
 
         this._createRequirementNames(requirementsText);
     }

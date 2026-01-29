@@ -6,6 +6,10 @@ class Programme
         this.faculty = faculty;
         this.programme_type = programme_type;
     }
+
+    getMajorRestrictionName() {
+        return `${this.code}_${this.programme_type}`;
+    }
 }
 
 class Building

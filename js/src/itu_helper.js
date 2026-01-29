@@ -148,10 +148,10 @@ class ITUHelper {
             let majors = [];
             if (data[10].trim() !== "-") {
                 for (const m of data[10].split(",")) {
-                    let major_code = m.trim().replace("_LS", "").replace("_OL", "");
+                    let major_code = m.trim();
                     let found_match = false;
                     for (const m_option of available_majors) {
-                        if (m_option.code === major_code) {
+                        if (m_option.getMajorRestrictionName() === major_code) {
                             majors.push(m_option);
                             found_match = true;
                         }

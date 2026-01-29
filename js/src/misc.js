@@ -1,10 +1,10 @@
 class Programme
 {
-    constructor(code, name, faculty, faculty_code) {
+    constructor(code, name, faculty, programme_type) {
         this.code = code;
         this.name = name;
         this.faculty = faculty;
-        this.faculty_code = faculty_code;
+        this.programme_type = programme_type;
     }
 }
 

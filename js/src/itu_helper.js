@@ -148,11 +148,15 @@ class ITUHelper {
             let majors = [];
             if (data[10].trim() !== "-") {
                 for (const m of data[10].split(",")) {
-                    let major_code = m.replace("_LS", "").trim();
+                    let major_code = m.trim();
                     for (const m_option of available_majors) {
                         if (m_option.code === major_code) {
                             majors.push(m_option);
+                            found_match = true;
                         }
+                    }
+                    if (!found_match) {
+                        majors.push(new Programme(major_code, "Auto Generated Programme", "", ""));
                     }
                 }
             }

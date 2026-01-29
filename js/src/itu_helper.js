@@ -148,7 +148,7 @@ class ITUHelper {
             let majors = [];
             if (data[10].trim() !== "-") {
                 for (const m of data[10].split(",")) {
-                    let major_code = m.trim();
+                    let major_code = m.trim().replace("_LS", "").replace("_OL", "");
                     let found_match = false;
                     for (const m_option of available_majors) {
                         if (m_option.code === major_code) {
